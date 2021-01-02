@@ -1,0 +1,3 @@
+[submodule "components/Thermistor"]
+	path = components/Thermistor
+	url = https://github.com/frklan/ESP32-Thermistor.git

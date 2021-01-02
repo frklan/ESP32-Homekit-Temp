@@ -1,0 +1,19 @@
+root = true
+
+[*]
+charset = utf-8
+trim_trailing_whitespace = false
+end_of_line = lf
+insert_final_newline = true
+
+[Makefile]
+indent_style = tab
+
+[*.{c,h,cpp,hpp}]
+indent_style = space
+indent_size = 2
+tab_width = 2
+curly_bracket_next_line = false
+spaces_around_operators = false
+spaces_around_brackets = none
+continuation_indent_size = 4
