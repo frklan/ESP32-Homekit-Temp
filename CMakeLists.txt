@@ -9,7 +9,7 @@ else()
   message(FATAL_ERROR "Homekit SDK not found, please set HOMEKIT_PATH")
 endif(DEFINED ENV{HOMEKIT_PATH})
 
-set(EXTRA_COMPONENT_DIRS ${HOMEKIT_PATH}/components ${HOMEKIT_PATH}/components/homekit ${HOMEKIT_PATH}/examples/common)
+set(EXTRA_COMPONENT_DIRS ${HOMEKIT_PATH}/components ${HOMEKIT_PATH}/components/homekit ${HOMEKIT_PATH}/examples/common $ENV{IDF_PATH}/examples/common_components/)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 project(TTS42)

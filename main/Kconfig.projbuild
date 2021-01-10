@@ -1,4 +1,4 @@
-menu "Example Configuration"
+menu "Homekit Configuration"
 
     config EXAMPLE_USE_HARDCODED_SETUP_CODE
         bool "Use hard-coded setup code"
@@ -23,4 +23,18 @@ menu "Example Configuration"
         help
             Setup id to be used for Homekit pairing, if hard-coded setup code is enabled.
 
+endmenu
+
+menu "Time Configuration"
+    config NTP_SERVER_NAME
+        string "NTP Server"
+        default "ntp1.sp.se"
+        help
+            NTP server to be used for setting local time
+
+    config NTP_SERVER_TIMEOUT
+        int "Timeout"
+        default 2000
+        help
+            Timeout in seconds for setting time via NTP
 endmenu
