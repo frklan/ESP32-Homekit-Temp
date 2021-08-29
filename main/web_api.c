@@ -24,6 +24,7 @@ static esp_err_t get_api_v1_get_temp_handler(httpd_req_t* req) {
   if(!outbuff) {
     ESP_LOGE(TAG, "Could not allocate memory");
     httpd_resp_send_500(req);
+    return ESP_FAIL;
   }
 
   json_gen_str_t jstr;
@@ -52,6 +53,7 @@ static esp_err_t get_api_v1_get_history_handler(httpd_req_t* req) {
   if(!outbuff) {
     ESP_LOGE(TAG, "Could not allocate memory");
     httpd_resp_send_500(req);
+    return ESP_FAIL;
   }
 
   const int MAX_HIST_LEN = 50;
@@ -105,6 +107,7 @@ esp_err_t start_api_server() {
       httpd_handle_t server = hap_platform_httpd_get_handle();
       if(server == NULL) {
         ESP_LOGE(TAG, "Error getting httpd");
+        ESP_FAIL
       }
       httpd_register_uri_handler(server, &uri_api_v1);
     
