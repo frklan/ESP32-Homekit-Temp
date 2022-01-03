@@ -46,7 +46,7 @@ static esp_err_t get_api_v1_get_temp_handler(httpd_req_t* req) {
 }
 
 static esp_err_t get_api_v1_get_history_handler(httpd_req_t* req) {
-  const int BUFF_SIZE = 1500;
+  const int BUFF_SIZE = 8192;
   char *outbuff = NULL;
   outbuff = calloc(BUFF_SIZE, sizeof(char));
 
@@ -56,26 +56,38 @@ static esp_err_t get_api_v1_get_history_handler(httpd_req_t* req) {
     return ESP_FAIL;
   }
 
-  const int MAX_HIST_LEN = 50;
-  struct sensor_history_t h[MAX_HIST_LEN];
-  memset(&h, 0, sizeof(struct sensor_history_t) * MAX_HIST_LEN);
-
-  int hist_len = get_sensor_history(ADC1_CHANNEL_6, &h[0], MAX_HIST_LEN);
-  json_gen_str_t jstr;
-  json_gen_str_start(&jstr, outbuff, BUFF_SIZE, NULL, NULL);
-  int err = json_gen_start_object(&jstr);
-  err += json_gen_push_array(&jstr, "h");
-
-  for(int i = 0; i < hist_len; i++) {
-    err += json_gen_start_object(&jstr);
-    err += json_gen_obj_set_int(&jstr, "t", h[i].time);
-    err += json_gen_obj_set_float(&jstr, "c", h[i].reading);
-    err += json_gen_end_object(&jstr);
+  const int MAX_HIST_LEN = 192;
+  struct sensor_history_t *h = NULL;
+  h = calloc(MAX_HIST_LEN, sizeof(struct sensor_history_t));
+  if(h == NULL) {
+    httpd_resp_send_500(req);
+    free(outbuff);
+    return ESP_FAIL;
+  }
+  
+  int hist_len = get_sensor_history(ADC1_CHANNEL_6, h, MAX_HIST_LEN);
+  json_gen_str_t *jstr = malloc(sizeof(json_gen_str_t));
+  if(jstr == NULL) {
+    httpd_resp_send_500(req);
+    free(h);
+    free(outbuff);
+    return ESP_FAIL;
   }
 
-  err += json_gen_pop_array(&jstr);
-  err += json_gen_end_object(&jstr);
-  json_gen_str_end(&jstr);
+  json_gen_str_start(jstr, outbuff, BUFF_SIZE, NULL, NULL);
+  int err = json_gen_start_object(jstr);
+  err += json_gen_push_array(jstr, "h");
+
+  for(int i = 0; i < hist_len; i++) {
+    err += json_gen_start_object(jstr);
+    err += json_gen_obj_set_int(jstr, "t", h[i].time);
+    err += json_gen_obj_set_float(jstr, "c", h[i].reading);
+    err += json_gen_end_object(jstr);
+  }
+
+  err += json_gen_pop_array(jstr);
+  err += json_gen_end_object(jstr);
+  json_gen_str_end(jstr);
   
   if(err == 0) {
     httpd_resp_set_status(req, HTTPD_200);
@@ -85,6 +97,8 @@ static esp_err_t get_api_v1_get_history_handler(httpd_req_t* req) {
     httpd_resp_send_500(req);
   }
   
+  free(jstr);
+  free(h);
   free(outbuff);
   return ESP_OK;
 }
